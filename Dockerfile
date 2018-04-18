@@ -23,19 +23,19 @@ RUN virtualenv $CKAN_HOME
 RUN ln -s $CKAN_HOME/bin/pip /usr/local/bin/ckan-pip
 RUN ln -s $CKAN_HOME/bin/paster /usr/local/bin/ckan-paster
 
+# Clone CKAN source from GitHub
+RUN git clone --branch ckan-$CKAN_VERSION --depth 1 https://github.com/ckan/ckan.git $CKAN_HOME/src/ckan/
+
 # Set up requirements
-ADD https://raw.githubusercontent.com/ckan/ckan/ckan-$CKAN_VERSION/requirements.txt $CKAN_HOME/src/ckan/
 RUN ckan-pip install --upgrade -r $CKAN_HOME/src/ckan/requirements.txt
 
 # TMP-BUGFIX https://github.com/ckan/ckan/issues/3388
-ADD https://raw.githubusercontent.com/ckan/ckan/ckan-$CKAN_VERSION/dev-requirements.txt $CKAN_HOME/src/ckan/
 RUN ckan-pip install --upgrade -r $CKAN_HOME/src/ckan/dev-requirements.txt
 
 # TMP-BUGFIX https://github.com/ckan/ckan/issues/3594
 RUN ckan-pip install --upgrade urllib3
 
 # Set up CKAN
-RUN git clone --branch ckan-$CKAN_VERSION --depth 1 https://github.com/ckan/ckan.git $CKAN_HOME/src/ckan/
 RUN ckan-pip install -e $CKAN_HOME/src/ckan/
 RUN ln -s $CKAN_HOME/src/ckan/ckan/config/who.ini $CKAN_CONFIG/who.ini
 
