@@ -1,8 +1,11 @@
 FROM debian:jessie
 
+ENV CKAN_VERSION 2.7.3
+
 ENV CKAN_HOME /usr/lib/ckan/default
 ENV CKAN_CONFIG /etc/ckan/default
 ENV CKAN_STORAGE_PATH /var/lib/ckan
+
 ENV CKAN_SITE_URL http://localhost:5000
 
 # Install required packages
@@ -21,23 +24,23 @@ RUN ln -s $CKAN_HOME/bin/pip /usr/local/bin/ckan-pip
 RUN ln -s $CKAN_HOME/bin/paster /usr/local/bin/ckan-paster
 
 # Set up requirements
-ADD ./requirements.txt $CKAN_HOME/src/ckan/requirements.txt
+ADD https://raw.githubusercontent.com/ckan/ckan/ckan-$CKAN_VERSION/requirements.txt $CKAN_HOME/src/ckan/
 RUN ckan-pip install --upgrade -r $CKAN_HOME/src/ckan/requirements.txt
 
 # TMP-BUGFIX https://github.com/ckan/ckan/issues/3388
-ADD ./dev-requirements.txt $CKAN_HOME/src/ckan/dev-requirements.txt
+ADD https://raw.githubusercontent.com/ckan/ckan/ckan-$CKAN_VERSION/dev-requirements.txt $CKAN_HOME/src/ckan/
 RUN ckan-pip install --upgrade -r $CKAN_HOME/src/ckan/dev-requirements.txt
 
 # TMP-BUGFIX https://github.com/ckan/ckan/issues/3594
 RUN ckan-pip install --upgrade urllib3
 
-# SetUp CKAN
-ADD . $CKAN_HOME/src/ckan/
+# Set up CKAN
+RUN git clone --branch ckan-$CKAN_VERSION --depth 1 https://github.com/ckan/ckan.git $CKAN_HOME/src/ckan/
 RUN ckan-pip install -e $CKAN_HOME/src/ckan/
 RUN ln -s $CKAN_HOME/src/ckan/ckan/config/who.ini $CKAN_CONFIG/who.ini
 
-# SetUp EntryPoint
-COPY ./contrib/docker/ckan-entrypoint.sh /
+# Set up entry point
+ADD https://raw.githubusercontent.com/ckan/ckan/ckan-$CKAN_VERSION/contrib/docker/ckan-entrypoint.sh /
 RUN chmod +x /ckan-entrypoint.sh
 ENTRYPOINT ["/ckan-entrypoint.sh"]
 
@@ -46,4 +49,4 @@ VOLUME ["/etc/ckan/default"]
 VOLUME ["/var/lib/ckan"]
 
 EXPOSE 5000
-CMD ["ckan-paster","serve","/etc/ckan/default/ckan.ini"]
+CMD ["ckan-paster", "serve", "/etc/ckan/default/ckan.ini"]
