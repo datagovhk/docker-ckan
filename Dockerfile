@@ -42,11 +42,11 @@ RUN ln -s $CKAN_HOME/src/ckan/ckan/config/who.ini $CKAN_CONFIG/who.ini
 # Set up entry point
 ADD https://raw.githubusercontent.com/ckan/ckan/ckan-$CKAN_VERSION/contrib/docker/ckan-entrypoint.sh /
 RUN chmod +x /ckan-entrypoint.sh
-ENTRYPOINT ["/ckan-entrypoint.sh"]
+# TEMP: ENTRYPOINT ["/ckan-entrypoint.sh"]
 
 # Volumes
-VOLUME ["/etc/ckan/default"]
-VOLUME ["/var/lib/ckan"]
+# TEMP: VOLUME ["/etc/ckan/default"]
+# TEMP: VOLUME ["/var/lib/ckan"]
 
 EXPOSE 5000
-CMD ["ckan-paster", "serve", "/etc/ckan/default/ckan.ini"]
+# TEMP: CMD ["ckan-paster", "serve", "/etc/ckan/default/ckan.ini"]
